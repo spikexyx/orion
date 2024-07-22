@@ -108,7 +108,12 @@ int main(void) {
     int threadsPerBlock = 256;
     int blocksPerGrid = (numElements + threadsPerBlock - 1) / threadsPerBlock;
     printf("CUDA kernel launch with %d blocks of %d threads\n", blocksPerGrid, threadsPerBlock);
-    vectorAdd<<<blocksPerGrid, threadsPerBlock>>>(d_A, d_B, d_C, numElements);
+
+    // launch 1000 times kernel
+    for (int i = 0; i < 1000; i++) {
+        vectorAdd<<<blocksPerGrid, threadsPerBlock>>>(d_A, d_B, d_C, numElements);
+    }
+
     err = cudaGetLastError();
     if (err != cudaSuccess) {
         fprintf(stderr, "Failed to launch vectorAdd kernel (error code %s)!\n", cudaGetErrorString(err));
