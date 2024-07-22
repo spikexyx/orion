@@ -23,22 +23,24 @@ cudaError_t cudaMemcpy(void* dst, const void* src, size_t count, enum cudaMemcpy
         orig_cudaMemcpy = (orig_cudaMemcpy_t)dlsym(RTLD_NEXT, "cudaMemcpy");
     }
 
-    int num_devices = 0;
-    cudaGetDeviceCount(&num_devices);
+//    int num_devices = 0;
+//    cudaGetDeviceCount(&num_devices);
+//
+//    cudaError_t err = cudaSuccess;
+//
+//    if(kind == cudaMemcpyDeviceToHost) {
+//        err = (*orig_cudaMemcpy)(dst, src, count, kind);
+//        return err;
+//    }
+//
+//    for(int i = 0; i < num_devices; i++) {
+//        cudaSetDevice(i);
+//        err = (*orig_cudaMemcpy)(dst, src, count, kind);
+//    }
+//
+//    return err;
 
-    cudaError_t err = cudaSuccess;
-
-    if(kind == cudaMemcpyDeviceToHost) {
-        err = (*orig_cudaMemcpy)(dst, src, count, kind);
-        return err;
-    }
-
-    for(int i = 0; i < num_devices; i++) {
-        cudaSetDevice(i);
-        err = (*orig_cudaMemcpy)(dst, src, count, kind);
-    }
-
-    return err;
+    return (*orig_cudaMemcpy)(dst, src, count, kind);
 }
 
 cudaError_t cudaMalloc(void** devPtr, size_t size) {
@@ -66,17 +68,19 @@ cudaError_t cudaFree(void* devPtr) {
         orig_cudaFree = (orig_cudaFree_t)dlsym(RTLD_NEXT, "cudaFree");
     }
 
-    int num_devices = 0;
-    cudaGetDeviceCount(&num_devices);
+//    int num_devices = 0;
+//    cudaGetDeviceCount(&num_devices);
+//
+//    cudaError_t err = cudaSuccess;
+//
+//    for(int i = 0; i < num_devices; i++) {
+//        cudaSetDevice(i);
+//        err = (*orig_cudaFree)(devPtr);
+//    }
+//
+//    return err;
 
-    cudaError_t err = cudaSuccess;
-
-    for(int i = 0; i < num_devices; i++) {
-        cudaSetDevice(i);
-        err = (*orig_cudaFree)(devPtr);
-    }
-
-    return err;
+    return (*orig_cudaFree)(devPtr);
 }
 
 // 劫持的 cudaLaunchKernel 实现

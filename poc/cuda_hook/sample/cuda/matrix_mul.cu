@@ -273,7 +273,7 @@ int main(int argc, char **argv) {
 
     // This will pick the best possible CUDA capable device, otherwise
     // override the device ID based on input provided at the command line
-    int dev = findCudaDevice(argc, (const char **)argv);
+    // int dev = findCudaDevice(argc, (const char **)argv);
 
     int block_size = 32;
 
