@@ -15,7 +15,7 @@ orig_cudaMemcpy_t orig_cudaMemcpy = nullptr;
 orig_cudaMalloc_t orig_cudaMalloc = nullptr;
 
 cudaError_t cudaMemcpy(void* dst, const void* src, size_t count, enum cudaMemcpyKind kind) {
-    printf("Hello from intercepted cudaMemcpy!\n");
+    // printf("Hello from intercepted cudaMemcpy!\n");
 
     if(!orig_cudaMemcpy) {
         orig_cudaMemcpy = (orig_cudaMemcpy_t)dlsym(RTLD_NEXT, "cudaMemcpy");
@@ -40,7 +40,7 @@ cudaError_t cudaMemcpy(void* dst, const void* src, size_t count, enum cudaMemcpy
 }
 
 cudaError_t cudaMalloc(void** devPtr, size_t size) {
-    printf("Hello from intercepted cudaMalloc!\n");
+    // printf("Hello from intercepted cudaMalloc!\n");
 
     if(!orig_cudaMalloc) {
         orig_cudaMalloc = (orig_cudaMalloc_t)dlsym(RTLD_NEXT, "cudaMalloc");
@@ -62,7 +62,7 @@ cudaError_t cudaMalloc(void** devPtr, size_t size) {
 // 劫持的 cudaLaunchKernel 实现
 cudaError_t cudaLaunchKernel(const void* func, dim3 gridDim, dim3 blockDim, void** args, size_t sharedMem, cudaStream_t stream) {
 
-    printf("Hello from intercepted cudaLaunchKernel!\n");
+    // printf("Hello from intercepted cudaLaunchKernel!\n");
 
     if (!orig_cudaLaunchKernel) {
         orig_cudaLaunchKernel = (orig_cudaLaunchKernel_t)dlsym(RTLD_NEXT, "cudaLaunchKernel");
