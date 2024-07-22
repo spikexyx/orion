@@ -184,7 +184,9 @@ int MatrixMultiply(int argc, char **argv, int block_size, const dim3 &dimsA, con
 //    checkCudaErrors(cudaStreamSynchronize(stream));
 
     // Record the start event
-    checkCudaErrors(cudaEventRecord(start, stream));
+//    checkCudaErrors(cudaEventRecord(start, stream));
+
+    checkCudaErrors(cudaEventRecord(start));
 
     // Execute the kernel
     int nIter = 300;
@@ -208,7 +210,7 @@ int MatrixMultiply(int argc, char **argv, int block_size, const dim3 &dimsA, con
     // Record the stop event
 //    checkCudaErrors(cudaEventRecord(stop, stream));
 
-    checkCudaErrors(cudaEventRecord(stop, stream));
+    checkCudaErrors(cudaEventRecord(stop));
 
     // Wait for the stop event to complete
     checkCudaErrors(cudaEventSynchronize(stop));
