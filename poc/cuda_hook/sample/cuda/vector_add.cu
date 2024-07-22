@@ -110,7 +110,7 @@ int main(void) {
     printf("CUDA kernel launch with %d blocks of %d threads\n", blocksPerGrid, threadsPerBlock);
 
     // launch 1000 times kernel
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 2000; i++) {
         vectorAdd<<<blocksPerGrid, threadsPerBlock>>>(d_A, d_B, d_C, numElements);
     }
 
