@@ -147,9 +147,9 @@ int MatrixMultiply(int argc, char **argv, int block_size, const dim3 &dimsA, con
     checkCudaErrors(cudaMalloc(reinterpret_cast<void **>(&d_C), mem_size_C));
 
     // Allocate CUDA events that we'll use for timing
-    cudaEvent_t start, stop;
-    checkCudaErrors(cudaEventCreate(&start));
-    checkCudaErrors(cudaEventCreate(&stop));
+//    cudaEvent_t start, stop;
+//    checkCudaErrors(cudaEventCreate(&start));
+//    checkCudaErrors(cudaEventCreate(&stop));
 
     // checkCudaErrors(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
 
@@ -186,7 +186,7 @@ int MatrixMultiply(int argc, char **argv, int block_size, const dim3 &dimsA, con
     // Record the start event
 //    checkCudaErrors(cudaEventRecord(start, stream));
 
-    checkCudaErrors(cudaEventRecord(start));
+//    checkCudaErrors(cudaEventRecord(start));
 
     // Execute the kernel
     int nIter = 300;
@@ -210,13 +210,13 @@ int MatrixMultiply(int argc, char **argv, int block_size, const dim3 &dimsA, con
     // Record the stop event
 //    checkCudaErrors(cudaEventRecord(stop, stream));
 
-    checkCudaErrors(cudaEventRecord(stop));
+//    checkCudaErrors(cudaEventRecord(stop));
 
     // Wait for the stop event to complete
-    checkCudaErrors(cudaEventSynchronize(stop));
+//    checkCudaErrors(cudaEventSynchronize(stop));
 
-    float msecTotal = 0.0f;
-    checkCudaErrors(cudaEventElapsedTime(&msecTotal, start, stop));
+    float msecTotal = 1.0f;
+//    checkCudaErrors(cudaEventElapsedTime(&msecTotal, start, stop));
 
     // Compute and print the performance
     float msecPerMatrixMul = msecTotal / nIter;
@@ -265,8 +265,8 @@ int MatrixMultiply(int argc, char **argv, int block_size, const dim3 &dimsA, con
     checkCudaErrors(cudaFree(d_B));
     checkCudaErrors(cudaFree(d_C));
 
-    checkCudaErrors(cudaEventDestroy(start));
-    checkCudaErrors(cudaEventDestroy(stop));
+//    checkCudaErrors(cudaEventDestroy(start));
+//    checkCudaErrors(cudaEventDestroy(stop));
     printf(
         "\nNOTE: The CUDA Samples are not meant for performance"
         "measurements. Results may vary when GPU Boost is enabled.\n");
