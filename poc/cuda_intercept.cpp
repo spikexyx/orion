@@ -9,10 +9,12 @@
 typedef cudaError_t (*orig_cudaLaunchKernel_t)(const void*, dim3, dim3, void**, size_t, cudaStream_t);
 typedef cudaError_t (*orig_cudaMemcpy_t)(void* dst, const void* src, size_t count, enum cudaMemcpyKind kind);
 typedef cudaError_t (*orig_cudaMalloc_t)(void** devPtr, size_t size);
+typedef cudaError_t (*orig_cudaFree_t)(void* devPtr);
 
 orig_cudaLaunchKernel_t orig_cudaLaunchKernel = nullptr;
 orig_cudaMemcpy_t orig_cudaMemcpy = nullptr;
 orig_cudaMalloc_t orig_cudaMalloc = nullptr;
+orig_cudaFree_t orig_cudaFree = nullptr;
 
 cudaError_t cudaMemcpy(void* dst, const void* src, size_t count, enum cudaMemcpyKind kind) {
     // printf("Hello from intercepted cudaMemcpy!\n");
@@ -54,6 +56,24 @@ cudaError_t cudaMalloc(void** devPtr, size_t size) {
     for(int i = 0; i < num_devices; i++) {
         cudaSetDevice(i);
         err = (*orig_cudaMalloc)(devPtr, size);
+    }
+
+    return err;
+}
+
+cudaError_t cudaFree(void* devPtr) {
+    if(!orig_cudaFree) {
+        orig_cudaFree = (orig_cudaFree_t)dlsym(RTLD_NEXT, "cudaFree");
+    }
+
+    int num_devices = 0;
+    cudaGetDeviceCount(&num_devices);
+
+    cudaError_t err = cudaSuccess;
+
+    for(int i = 0; i < num_devices; i++) {
+        cudaSetDevice(i);
+        err = (*orig_cudaFree)(devPtr);
     }
 
     return err;
