@@ -229,8 +229,11 @@ int MatrixMultiply(int argc, char **argv, int block_size, const dim3 &dimsA, con
         gigaFlops, msecPerMatrixMul, flopsPerMatrixMul, threads.x * threads.y);
 
     // Copy result from device to host
-    checkCudaErrors(cudaMemcpyAsync(h_C, d_C, mem_size_C, cudaMemcpyDeviceToHost, stream));
-    checkCudaErrors(cudaStreamSynchronize(stream));
+//    checkCudaErrors(cudaMemcpyAsync(h_C, d_C, mem_size_C, cudaMemcpyDeviceToHost, stream));
+//    checkCudaErrors(cudaStreamSynchronize(stream));
+
+    checkCudaErrors(cudaMemcpyAsync(h_C, d_C, mem_size_C, cudaMemcpyDeviceToHost));
+//    checkCudaErrors(cudaStreamSynchronize(stream));
 
     printf("Checking computed result for correctness: ");
     bool correct = true;
