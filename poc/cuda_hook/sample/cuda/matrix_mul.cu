@@ -122,7 +122,7 @@ int MatrixMultiply(int argc, char **argv, int block_size, const dim3 &dimsA, con
     unsigned int mem_size_B = sizeof(float) * size_B;
     float *h_B;
     checkCudaErrors(cudaMallocHost((void **)&h_B, mem_size_B));
-    // cudaStream_t stream;
+     cudaStream_t stream;
 
     // Initialize host memory
     const float valB = 0.01f;
@@ -147,18 +147,18 @@ int MatrixMultiply(int argc, char **argv, int block_size, const dim3 &dimsA, con
     checkCudaErrors(cudaMalloc(reinterpret_cast<void **>(&d_C), mem_size_C));
 
     // Allocate CUDA events that we'll use for timing
-//    cudaEvent_t start, stop;
-//    checkCudaErrors(cudaEventCreate(&start));
-//    checkCudaErrors(cudaEventCreate(&stop));
+    cudaEvent_t start, stop;
+    checkCudaErrors(cudaEventCreate(&start));
+    checkCudaErrors(cudaEventCreate(&stop));
 
-    // checkCudaErrors(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
+     checkCudaErrors(cudaStreamCreateWithFlags(&stream, cudaStreamNonBlocking));
 
     // copy host memory to device
-//    checkCudaErrors(cudaMemcpyAsync(d_A, h_A, mem_size_A, cudaMemcpyHostToDevice, stream));
-//    checkCudaErrors(cudaMemcpyAsync(d_B, h_B, mem_size_B, cudaMemcpyHostToDevice, stream));
+    checkCudaErrors(cudaMemcpyAsync(d_A, h_A, mem_size_A, cudaMemcpyHostToDevice, stream));
+    checkCudaErrors(cudaMemcpyAsync(d_B, h_B, mem_size_B, cudaMemcpyHostToDevice, stream));
 
-    checkCudaErrors(cudaMemcpyAsync(d_A, h_A, mem_size_A, cudaMemcpyHostToDevice));
-    checkCudaErrors(cudaMemcpyAsync(d_B, h_B, mem_size_B, cudaMemcpyHostToDevice));
+//    checkCudaErrors(cudaMemcpyAsync(d_A, h_A, mem_size_A, cudaMemcpyHostToDevice));
+//    checkCudaErrors(cudaMemcpyAsync(d_B, h_B, mem_size_B, cudaMemcpyHostToDevice));
 
     // Setup execution parameters
     dim3 threads(block_size, block_size);
@@ -168,55 +168,55 @@ int MatrixMultiply(int argc, char **argv, int block_size, const dim3 &dimsA, con
     printf("Computing result using CUDA Kernel...\n");
 
     // Performs warmup operation using matrixMul CUDA kernel
-//    if (block_size == 16) {
-//        MatrixMulCUDA<16><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-//    } else {
-//        MatrixMulCUDA<32><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-//    }
-
     if (block_size == 16) {
-        MatrixMulCUDA<16><<<grid, threads, 0>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+        MatrixMulCUDA<16><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
     } else {
-        MatrixMulCUDA<32><<<grid, threads, 0>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+        MatrixMulCUDA<32><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
     }
 
+//    if (block_size == 16) {
+//        MatrixMulCUDA<16><<<grid, threads, 0>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+//    } else {
+//        MatrixMulCUDA<32><<<grid, threads, 0>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+//    }
+
     printf("done\n");
-//    checkCudaErrors(cudaStreamSynchronize(stream));
+    checkCudaErrors(cudaStreamSynchronize(stream));
 
     // Record the start event
-//    checkCudaErrors(cudaEventRecord(start, stream));
+    checkCudaErrors(cudaEventRecord(start, stream));
 
 //    checkCudaErrors(cudaEventRecord(start));
 
     // Execute the kernel
     int nIter = 300;
 
-//    for (int j = 0; j < nIter; j++) {
-//        if (block_size == 16) {
-//            MatrixMulCUDA<16><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-//        } else {
-//            MatrixMulCUDA<32><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
-//        }
-//    }
-
     for (int j = 0; j < nIter; j++) {
         if (block_size == 16) {
-            MatrixMulCUDA<16><<<grid, threads, 0>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+            MatrixMulCUDA<16><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
         } else {
-            MatrixMulCUDA<32><<<grid, threads, 0>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+            MatrixMulCUDA<32><<<grid, threads, 0, stream>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
         }
     }
 
+//    for (int j = 0; j < nIter; j++) {
+//        if (block_size == 16) {
+//            MatrixMulCUDA<16><<<grid, threads, 0>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+//        } else {
+//            MatrixMulCUDA<32><<<grid, threads, 0>>>(d_C, d_A, d_B, dimsA.x, dimsB.x);
+//        }
+//    }
+
     // Record the stop event
-//    checkCudaErrors(cudaEventRecord(stop, stream));
+    checkCudaErrors(cudaEventRecord(stop, stream));
 
 //    checkCudaErrors(cudaEventRecord(stop));
 
     // Wait for the stop event to complete
-//    checkCudaErrors(cudaEventSynchronize(stop));
+    checkCudaErrors(cudaEventSynchronize(stop));
 
     float msecTotal = 1.0f;
-//    checkCudaErrors(cudaEventElapsedTime(&msecTotal, start, stop));
+    checkCudaErrors(cudaEventElapsedTime(&msecTotal, start, stop));
 
     // Compute and print the performance
     float msecPerMatrixMul = msecTotal / nIter;
@@ -229,10 +229,10 @@ int MatrixMultiply(int argc, char **argv, int block_size, const dim3 &dimsA, con
         gigaFlops, msecPerMatrixMul, flopsPerMatrixMul, threads.x * threads.y);
 
     // Copy result from device to host
-//    checkCudaErrors(cudaMemcpyAsync(h_C, d_C, mem_size_C, cudaMemcpyDeviceToHost, stream));
-//    checkCudaErrors(cudaStreamSynchronize(stream));
+    checkCudaErrors(cudaMemcpyAsync(h_C, d_C, mem_size_C, cudaMemcpyDeviceToHost, stream));
+    checkCudaErrors(cudaStreamSynchronize(stream));
 
-    checkCudaErrors(cudaMemcpyAsync(h_C, d_C, mem_size_C, cudaMemcpyDeviceToHost));
+//    checkCudaErrors(cudaMemcpyAsync(h_C, d_C, mem_size_C, cudaMemcpyDeviceToHost));
 //    checkCudaErrors(cudaStreamSynchronize(stream));
 
     printf("Checking computed result for correctness: ");
@@ -265,8 +265,8 @@ int MatrixMultiply(int argc, char **argv, int block_size, const dim3 &dimsA, con
     checkCudaErrors(cudaFree(d_B));
     checkCudaErrors(cudaFree(d_C));
 
-//    checkCudaErrors(cudaEventDestroy(start));
-//    checkCudaErrors(cudaEventDestroy(stop));
+    checkCudaErrors(cudaEventDestroy(start));
+    checkCudaErrors(cudaEventDestroy(stop));
     printf(
         "\nNOTE: The CUDA Samples are not meant for performance"
         "measurements. Results may vary when GPU Boost is enabled.\n");
